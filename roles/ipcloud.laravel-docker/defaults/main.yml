@@ -1,2 +1,5 @@
 ---
 # defaults file for ipcloud.laravel-docker
+mysql_database: laravel
+mysql_user: laravel
+mysql_password: defaultpassword123

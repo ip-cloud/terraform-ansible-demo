@@ -1,16 +1,62 @@
 ---
 # tasks file for ipcloud.laravel-docker
-- include: git_clone
-
-- name: Create Laravel Data directories
-  file:
-    path: {{item}}
-    state: directory
-  with_items:
-    - "/usr/mysql_data"
-    - "/usr/laravel_app"
+- include: git_clone.yml
 
 - name: Build Laravel Image
   docker_image:
     path: /usr/source
     name: laravel-app
+
+- name: Create Laravel Data directories
+  file:
+    path: "{{item}}"
+    state: directory
+  with_items:
+    - "/usr/mysql_data"
+    - "/usr/laravel_app"
+
+- name: Check for the presence of the Laravel network
+  command: bash -c "docker network ls | grep -io laravel"
+  register: laravel_network
+  failed_when: laravel_network.rc >= 2
+
+- name: Create the Laravel Docker Network
+  command: docker network create laravel
+  when: laravel_network.rc == 1
+
+- name: Start the MySQL container
+  docker_container:
+    name: mysql
+    image: mysql
+    volumes:
+      - "/usr/mysql_data:/var/lib/mysql"
+    env:
+      MYSQL_DATABASE: "{{mysql_database}}"
+      MYSQL_USER: "{{mysql_user}}"
+      MYSQL_PASSWORD: "{{mysql_password}}"
+      MYSQL_RANDOM_ROOT_PASSWORD: yes
+    state: started
+    networks:
+      - name: laravel
+
+- name: Start Laravel Application
+  docker_container:
+    name: laravel_app
+    image: laravel-app
+    state: started
+    networks:
+      - name: laravel
+    env:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: "{{mysql_database}}"
+      DB_USERNAME: "{{mysql_user}}"
+      DB_PASSWORD: "{{mysql_password}}"
+    ports:
+      - "80:80"
+
+- name: Run Composer install
+  command: docker exec laravel_app -u www-data composer install -d /var/www/laravel
+
+- name: Migrate the database
+  command: docker exec laravel_app -u www-data php /var/www/laravel/artisan migrate
