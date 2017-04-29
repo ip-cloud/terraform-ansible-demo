@@ -1,0 +1,5 @@
+*.tf
+*.backup
+*.tfstate
+inventory
+*.retry

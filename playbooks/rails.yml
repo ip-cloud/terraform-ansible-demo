@@ -1,0 +1,6 @@
+---
+- name: Say hello
+  hosts: docker
+  tasks:
+  - name: 'Say hello'
+    command: 'echo hello'
