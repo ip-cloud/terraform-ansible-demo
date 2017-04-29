@@ -29,7 +29,7 @@ resource "digitalocean_droplet" "docker" {
         command = "touch inventory"
     }
     provisioner "local-exec" {
-        command = "echo '[docker:vars]\ndocker_repo_url=${var.github_url}\nssh_username=root\nansible_user=root\n[docker]\n${self.ipv4_address}\n' > inventory"
+        command = "echo '[docker:vars]\nrepository_path=${var.github_url}\nssh_username=root\nansible_user=root\n[docker]\n${self.ipv4_address}\n' > inventory"
     }
     provisioner "remote-exec" {
         inline = [

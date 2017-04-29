@@ -1,0 +1,8 @@
+---
+# defaults file for ipcloud.rails-docker
+repository_path: ""
+secret_key: "DO_NOT_USE_THIS_SECRET"
+rails_env: "production"
+postgresql_user: rails
+postgresql_password: rails_password
+postgresql_database: rails_app

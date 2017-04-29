@@ -1,0 +1,16 @@
+---
+# tasks file for ipcloud.laravel-docker
+- include: git_clone
+
+- name: Create Laravel Data directories
+  file:
+    path: {{item}}
+    state: directory
+  with_items:
+    - "/usr/mysql_data"
+    - "/usr/laravel_app"
+
+- name: Build Laravel Image
+  docker_image:
+    path: /usr/source
+    name: laravel-app

@@ -1,0 +1,7 @@
+---
+- name: Install Docker
+  hosts: docker
+  roles:
+  - role: ipcloud.common-ubuntu
+  - role: ipcloud.docker
+  - role: ipcloud.laravel-docker

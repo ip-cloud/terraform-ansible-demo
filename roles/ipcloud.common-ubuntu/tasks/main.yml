@@ -1,0 +1,10 @@
+---
+# tasks file for ipcloud.common-ubuntu
+- name: Install Git
+  apt: pkg=git state=present
+
+- debug:
+    msg: "{{repository_path}}"
+
+- debug:
+    msg: "{{ansible_user}}"

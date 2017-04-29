@@ -1,6 +1,7 @@
 ---
-- name: Say hello
-  hosts: docker
-  tasks:
-  - name: 'Say hello'
-    command: 'echo hello'
+- name: Install Docker
+  hosts: all
+  roles:
+  - role: ipcloud.common-ubuntu
+  - role: ipcloud.docker
+  - role: ipcloud.rails-docker

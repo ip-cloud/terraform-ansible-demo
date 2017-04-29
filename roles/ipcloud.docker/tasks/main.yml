@@ -1,0 +1,31 @@
+---
+# tasks file for ipcloud.docker
+- name: Install Docker CE Prerequisistes
+  apt: state=latest pkg={{item}}
+  with_items:
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - python-pip
+
+- name: Install Docker Ansible Handler
+  pip: name=docker-py state=present
+
+- name: Add Docker CE Signing Key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: Add Docker Repository
+  command: sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable"
+
+- name: Install Docker
+  apt: state=latest pkg=docker-ce update_cache=yes
+
+- name: Start Docker
+  service:
+    name: docker
+    state: started
+
+- name: Verify Docker is working
+  command: docker version

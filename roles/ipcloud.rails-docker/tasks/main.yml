@@ -1,0 +1,54 @@
+---
+# tasks file for ipcloud.rails-docker
+- include: git_clone.yml
+
+- name: Build Docker Image
+  docker_image:
+      path: /usr/source
+      name: rails-app
+
+- name: Create volume directories
+  file:
+    path: "{{item}}"
+    state: directory
+  with_items:
+    - /usr/rails_public
+    - /usr/postgres_data
+
+#- name: Deploy docker-compose template
+#  template:
+#    src: docker-compose.yml
+#    dest: /usr/docker-compose.yml
+
+- name: Group database and app in 1 Network
+  command: docker network create rails
+
+- name: Start PostgreSQL Container
+  docker_container:
+    name: postgres
+    image: postgresql
+    volumes:
+      - "/usr/postgres_data:/var/lib/postgresql/data"
+    state: started
+    networks:
+      - name: rails
+    env:
+      POSTGRES_PASSWORD: "{{postgresql_password}}"
+      POSTGRES_USER: "{{postgresql_user}}"
+      POSTGRES_DB: "{{postgresql_database}}"
+
+- name: Start Rails Application
+  docker_container:
+    name: rails_app
+    image: rails_app
+    volumes:
+      - "/usr/rails_public:/usr/src/app/public"
+    state: started
+    networks:
+      - name: rails
+    env:
+      SECRET_KEY_BASE: "{{secret_key}}"
+      RAILS_ENV: "{{rails_env}}"
+      PG_USER: "{{postgresql_user}}"
+      PG_PASS: "{{postgresql_password}}"
+      PG_DATABASE: "{{postgresql_database}}"
