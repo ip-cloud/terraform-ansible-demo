@@ -6,6 +6,10 @@
   docker_image:
       path: /usr/source
       name: rails-app
+  register: rails_image
+
+- debug:
+    msg: "{{rails_image}}"
 
 - name: Create volume directories
   file:
@@ -20,13 +24,22 @@
 #    src: docker-compose.yml
 #    dest: /usr/docker-compose.yml
 
+- name: Check for presence of the Rails network
+  command: bash -c "docker network ls | grep -io rails"
+  register: rails_network
+  failed_when: rails_network.rc >= 2
+
+- debug:
+    msg: "{{rails_network}}"
+
 - name: Group database and app in 1 Network
   command: docker network create rails
+  when: rails_network.rc == 1
 
 - name: Start PostgreSQL Container
   docker_container:
     name: postgres
-    image: postgresql
+    image: postgres
     volumes:
       - "/usr/postgres_data:/var/lib/postgresql/data"
     state: started
@@ -40,7 +53,7 @@
 - name: Start Rails Application
   docker_container:
     name: rails_app
-    image: rails_app
+    image: rails-app
     volumes:
       - "/usr/rails_public:/usr/src/app/public"
     state: started
@@ -52,3 +65,5 @@
       PG_USER: "{{postgresql_user}}"
       PG_PASS: "{{postgresql_password}}"
       PG_DATABASE: "{{postgresql_database}}"
+    ports:
+      - "80:3000"
