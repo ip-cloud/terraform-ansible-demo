@@ -45,7 +45,7 @@ resource "google_compute_instance" "docker" {
   }
 
   provisioner "local-exec" {
-    command = "echo '[docker:vars]\nrepository_path=${var.github_url}\nssh_username=docker\nansible_user=docker\n[docker]\n${self.network_interface.0.access_config.0.assigned_nat_ip}\n' > inventory"
+    command = "echo '[docker:vars]\nrepository_path=${var.github_url}\nssh_username=docker\nansible_user=docker\nansible_become=true\n[docker]\n${self.network_interface.0.access_config.0.assigned_nat_ip}\n' > inventory"
   }
 
   provisioner "local-exec" {

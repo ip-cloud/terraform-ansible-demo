@@ -1,0 +1,35 @@
+variable "access_key" {}
+variable "token" {}
+variable "app_type" {}
+variable "github_url" {}
+
+provider "scaleway" {
+  organization = "${var.access_key}"
+  token        = "${var.token}"
+  region       = "par1"
+}
+
+resource "scaleway_ip" "ip" {
+  server = "${scaleway_server.test.id}"
+
+  provisioner "local-exec" {
+    command = "echo '[docker:vars]\nrepository_path=${var.github_url}\nssh_username=docker\nansible_user=root\n[docker]\n${self.ip}\n' > inventory"
+  }
+
+  provisioner "local-exec" {
+    command = "ansible-playbook -i inventory playbooks/${var.app_type}.yml"
+  }
+
+}
+
+resource "scaleway_server" "test" {
+  name  = "test"
+  image = "aecaed73-51a5-4439-a127-6d8229847145"
+  type  = "C2S"
+}
+
+resource "scaleway_volume" "test" {
+  name       = "test"
+  size_in_gb = 50
+  type       = "l_ssd"
+}

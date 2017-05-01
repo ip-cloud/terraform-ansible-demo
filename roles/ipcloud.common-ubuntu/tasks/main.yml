@@ -1,4 +1,4 @@
 ---
 # tasks file for ipcloud.common-ubuntu
 - name: Install Git
-  apt: pkg=git state=present
+  apt: pkg=git state=present update_cache=yes
