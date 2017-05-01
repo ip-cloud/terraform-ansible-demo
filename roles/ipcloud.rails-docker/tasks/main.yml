@@ -68,3 +68,9 @@
       DB_HOST: postgres
     ports:
       - "80:3000"
+
+- name: Run database migrations
+  command: docker exec rails_app bundle exec rake db:migrate
+
+- name: Precompile Rails Assets:
+  command: docker exec rails_app bundle exec rake assets:precompile
