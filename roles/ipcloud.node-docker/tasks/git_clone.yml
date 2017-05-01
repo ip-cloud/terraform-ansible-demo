@@ -1,0 +1,11 @@
+---
+- name: Create Source directory
+  file:
+    path: '/usr/source'
+    state: directory
+
+- name: Clone Requested Repository
+  git:
+    repo: "{{repository_path}}"
+    dest: '/usr/source'
+    accept_hostkey: yes

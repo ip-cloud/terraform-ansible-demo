@@ -1,0 +1,35 @@
+---
+# tasks file for ipcloud.node-docker
+- include: git_clone.yml
+
+- name: Build Docker Image
+  docker_image:
+      path: /usr/source
+      name: node-app
+  register: node_image
+
+- debug:
+    msg: "{{node_image}}"
+
+
+- name: Check for presence of the NodeJS network
+  command: bash -c "docker network ls | grep -io nodejs"
+  register: rails_network
+  failed_when: rails_network.rc >= 2
+
+- debug:
+    msg: "{{rails_network}}"
+
+- name: Create NodeJS network
+  command: docker network create nodejs
+  when: rails_network.rc == 1
+
+- name: Start Node Application
+  docker_container:
+    name: node_app
+    image: node-app
+    state: started
+    networks:
+      - name: node
+    ports:
+      - "80:3000"
