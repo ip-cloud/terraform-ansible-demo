@@ -1,0 +1,9 @@
+version: "2"
+services:
+  terraform-ansible:
+    container_name: terraform
+    build: .
+    volumes:
+      - ".:/root/terraform"
+      - "~/.ssh:/root/host_ssh/"
+

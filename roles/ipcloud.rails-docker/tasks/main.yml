@@ -72,5 +72,5 @@
 - name: Run database migrations
   command: docker exec rails_app bundle exec rake db:migrate
 
-- name: Precompile Rails Assets:
+- name: Precompile Rails Assets
   command: docker exec rails_app bundle exec rake assets:precompile
